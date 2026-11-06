@@ -1,0 +1,21 @@
+services:
+  pdf-tools:
+    build: .
+    image: pdf-tools:latest
+    ports:
+      - "${PUBLISH_PORT:-3000}:3000"
+    env_file:
+      - .env.docker
+    environment:
+      HOST: 0.0.0.0
+      PORT: "3000"
+      MAX_FILE_SIZE_MB: ${MAX_FILE_SIZE_MB:-50}
+      MAX_FILES: ${MAX_FILES:-20}
+      PDF_SERVICES_CLIENT_ID: ${PDF_SERVICES_CLIENT_ID:-}
+      PDF_SERVICES_CLIENT_SECRET: ${PDF_SERVICES_CLIENT_SECRET:-}
+    volumes:
+      - pdf-tools-tmp:/app/tmp
+    restart: unless-stopped
+
+volumes:
+  pdf-tools-tmp:
