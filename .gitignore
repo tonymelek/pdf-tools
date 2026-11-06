@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+yarn.lock
 
 # Legacy Express app (local only — not published)
 v1/
