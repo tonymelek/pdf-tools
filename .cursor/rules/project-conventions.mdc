@@ -1,0 +1,34 @@
+# PDF Tools — Conventions
+
+TanStack Start (Vite + Nitro). Legacy Express v1 and personal CLI data may exist locally in `v1/` and `unrelated/` (gitignored, not in the public repo).
+
+## Scope
+
+- **In scope (v2):** Combine, split, and Adobe tool catalog via server functions in `src/server/` (`pdf.functions.ts`, `adobe.functions.ts`), UI in `src/routes/` and `src/components/`.
+- **Out of scope:** `unrelated/scripts/` tools — never add to web routes.
+
+## Architecture rules
+
+1. **No persistent server output** — `tmp/<uuid>/`, stream `Response` from server functions, delete in `finally`.
+2. **Never serve** `tmp/` or `unrelated/` as static routes.
+3. **Per-request temp dirs** — no shared upload folder.
+4. **Server PDF logic** — `src/server/lib/*.ts`; call `ensureServerEnv()` from `env.server.ts` only in `*.server.ts` modules (never import dotenv from `*.functions.ts`).
+5. **Server functions** — `*.functions.ts` are client-importable: use only `createServerFn` + dynamic `import('./…server')` inside handlers.
+6. **UI:** React + Tailwind v4 (`@tailwindcss/vite`); use route loaders + `useServerFn` for server calls.
+
+## File placement
+
+| What | Where |
+|------|--------|
+| TanStack routes | `src/routes/` |
+| Server functions | `src/server/*.functions.ts` |
+| PDF logic, temp, names | `src/server/lib/` |
+| Shared client utils | `src/lib/` |
+| Components | `src/components/` |
+| Local-only (gitignored) | `v1/`, `unrelated/` |
+
+## Dependencies (v2 app)
+
+`@tanstack/react-start`, `@tanstack/react-router`, `nitro`, `vite`, `react`, `pdf-lib`, `archiver`, `dotenv`
+
+Root `package.json` includes `@adobe/pdfservices-node-sdk` for v2 Adobe tools. Do not add `express` or `multer` to v2.

@@ -1,0 +1,26 @@
+# PDF Tools — Status
+
+## Shipped (TanStack Start + Nitro)
+
+- SSR + client hydration (React 19, Vite 8, Nitro)
+- `/`, `/combine`, `/split`, `/library`, `/tools/:id` with Tailwind v4
+- Adobe PDF Services catalog + `runAdobeTool` server function (v1 lib under `src/server/lib/adobe/`)
+- Server functions: `combinePdfs`, `splitPdf`, `getUploadLimits` (`src/server/pdf.functions.ts`)
+- PDF libs ported to TypeScript under `src/server/lib/`
+- `npm run dev` / `npm run build` / `npm start` (`.output/server/index.mjs`)
+
+## Repo layout
+
+- **App:** `src/`, `public/`, `vite.config.ts`, `package.json`
+- **Gitignored locally:** `v1/`, `unrelated/`, `tmp/`, secrets
+
+## Optional follow-ups
+
+- Page-range split, combine reorder UI
+- Tools marked “Info only” in catalog (external storage samples, etc.)
+
+## Do not
+
+- Expose `tmp/` or `unrelated/` via static routes
+- Move `unrelated/scripts/` into the web UI without explicit request
+- Commit PDFs, `tmp/`, `.output/`, or `.env`
