@@ -1,0 +1,13 @@
+node_modules
+.output
+tmp
+dist
+.git
+.github
+.cursor
+v1/node_modules
+unrelated
+*.pdf
+.env
+.env.*
+!.env.docker.example

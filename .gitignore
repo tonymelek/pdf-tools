@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+
+# Legacy Express app (local only — not published)
+v1/
+
+# Build & runtime (v2)
+.output/
+dist/
+.tanstack/
+tmp/
+
+# Local workspace — not part of the public app
+unrelated/
+
+# Secrets & local env (never commit)
+.env
+.env.*
+!.env.example
+!.env.docker.example
+*.pem
+*.key
+**/pdfservices-api-credentials.json
+**/*credentials*.json
+
+# OS & editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Cursor (keep shared rules only)
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
+
+# Vendor / personal CI instructions
+.github/instructions/
+
+# Generated / local binaries
+*.pdf
+*.zip
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Optional local Docker env (use .env.docker.example as template)
+.env.docker
