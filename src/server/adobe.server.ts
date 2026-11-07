@@ -10,6 +10,7 @@ import {
   getMaxFileSizeMb,
   getMaxFiles,
 } from '#/server/lib/upload-limits.server'
+import type { CatalogTool } from '#/lib/tool-definition'
 
 const serverDir = fileURLToPath(new URL('.', import.meta.url))
 const require = createRequire(serverDir)
@@ -24,15 +25,8 @@ const ADOBE_MODULE_PATHS = [
 ]
 
 type AdobeBridge = {
-  getTool: (id: string) => {
-    id: string
-    provider: string
-    implemented: boolean
-    note?: string | null
-    fields?: { name: string }[]
-    output: { downloadName: string; contentType: string }
-  } | null
-  getToolsByCategory: () => { category: string; tools: unknown[] }[]
+  getTool: (id: string) => CatalogTool | null
+  getToolsByCategory: () => { category: string; tools: CatalogTool[] }[]
   isAdobeConfigured: () => boolean
   formatAdobeError: (err: unknown) => string
   runOperation: (
@@ -140,7 +134,8 @@ export async function runAdobeToolImpl(formData: FormData, toolId: string) {
     }
 
     let downloadName = tool.output.downloadName
-    let contentType = tool.output.contentType
+    let contentType: string =
+      tool.output.contentType ?? 'application/octet-stream'
     if (
       tool.id === 'autotag-pdf-with-options' &&
       body.generateReport === 'true'
@@ -149,7 +144,11 @@ export async function runAdobeToolImpl(formData: FormData, toolId: string) {
       contentType = 'application/zip'
     }
 
-    return new Response(result.buffer, {
+    if (result.buffer === undefined) {
+      throw new Error('Adobe operation returned no file buffer')
+    }
+
+    return new Response(new Uint8Array(result.buffer), {
       status: 200,
       headers: {
         'Content-Type': contentType,

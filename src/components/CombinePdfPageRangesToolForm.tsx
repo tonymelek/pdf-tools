@@ -7,9 +7,11 @@ import {
   validatePageRangeLine,
   validatePageRangesForFiles,
 } from '#/lib/page-ranges'
+import { AdobeJobProgress } from '#/components/AdobeJobProgress'
 import { downloadResponseAsFile } from '#/lib/download'
+import { totalBytesFromFormData } from '#/lib/adobe-job-progress'
 import { runAdobeTool } from '#/server/adobe.functions'
-import type { ToolDefinition } from '#/components/ToolForm'
+import type { ToolDefinition } from '#/lib/tool-definition'
 
 const MIN_PDFS = 2
 
@@ -28,6 +30,7 @@ export function CombinePdfPageRangesToolForm({
   const [files, setFiles] = useState<File[]>([])
   const [ranges, setRanges] = useState<string[]>([])
   const [busy, setBusy] = useState(false)
+  const [uploadBytes, setUploadBytes] = useState(0)
   const [status, setStatus] = useState<{
     message: string
     type: 'error' | 'success'
@@ -76,6 +79,7 @@ export function CombinePdfPageRangesToolForm({
     files.forEach((file) => formData.append('pdfs', file))
     formData.set('pageRangesPerFile', ranges.join('\n'))
 
+    setUploadBytes(totalBytesFromFormData(formData))
     setBusy(true)
     setStatus(null)
 
@@ -91,6 +95,7 @@ export function CombinePdfPageRangesToolForm({
       })
     } finally {
       setBusy(false)
+      setUploadBytes(0)
     }
   }
 
@@ -182,6 +187,10 @@ export function CombinePdfPageRangesToolForm({
         <p className="text-sm text-danger" role="alert">
           {rangeError}
         </p>
+      )}
+
+      {busy && (
+        <AdobeJobProgress active={busy} totalUploadBytes={uploadBytes} />
       )}
 
       {status && <StatusBanner message={status.message} type={status.type} />}

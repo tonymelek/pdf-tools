@@ -4,7 +4,6 @@ import { CombinePdfPageRangesToolForm } from '#/components/CombinePdfPageRangesT
 import {
   AdobeCredentialsBanner,
   ToolForm,
-  type ToolDefinition,
 } from '#/components/ToolForm'
 import { getToolDetails } from '#/server/adobe.functions'
 
@@ -64,14 +63,14 @@ function ToolPage() {
         </div>
       ) : tool.id === 'combine-pdf-with-page-ranges' ? (
         <CombinePdfPageRangesToolForm
-          tool={tool as ToolDefinition}
+          tool={tool}
           canRun={canRun}
           maxFileSizeMb={maxFileSizeMb}
           maxFiles={maxFiles}
         />
       ) : (
         <ToolForm
-          tool={tool as ToolDefinition}
+          tool={tool}
           canRun={canRun}
           maxFileSizeMb={maxFileSizeMb}
         />

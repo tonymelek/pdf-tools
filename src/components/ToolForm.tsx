@@ -3,42 +3,12 @@ import { useState } from 'react'
 import { FilePicker } from '#/components/FilePicker'
 import { runAdobeTool } from '#/server/adobe.functions'
 import { StatusBanner } from '#/components/StatusBanner'
+import { AdobeJobProgress } from '#/components/AdobeJobProgress'
 import { downloadResponseAsFile } from '#/lib/download'
+import { totalBytesFromFormData } from '#/lib/adobe-job-progress'
+import type { ToolDefinition } from '#/lib/tool-definition'
 
-type ToolField = {
-  name: string
-  label: string
-  type?: string
-  placeholder?: string
-  defaultValue?: string
-  help?: string
-  options?: { value: string; label: string }[]
-}
-
-type ToolFile = {
-  field: string
-  label: string
-  accept: string
-  multiple?: boolean
-  required?: boolean
-}
-
-export type ToolDefinition = {
-  id: string
-  name: string
-  description: string
-  category: string
-  sample?: string | null
-  implemented: boolean
-  files: ToolFile[]
-  fields: ToolField[]
-  output: {
-    downloadName: string
-    contentType?: string
-    zip?: boolean
-  }
-  note?: string | null
-}
+export type { ToolDefinition } from '#/lib/tool-definition'
 
 export function ToolForm({
   tool,
@@ -51,6 +21,7 @@ export function ToolForm({
 }) {
   const runTool = useServerFn(runAdobeTool)
   const [busy, setBusy] = useState(false)
+  const [uploadBytes, setUploadBytes] = useState(0)
   const [status, setStatus] = useState<{
     message: string
     type: 'error' | 'success'
@@ -64,6 +35,7 @@ export function ToolForm({
     const formData = new FormData(form)
     formData.set('toolId', tool.id)
 
+    setUploadBytes(totalBytesFromFormData(formData))
     setBusy(true)
     setStatus(null)
 
@@ -82,6 +54,7 @@ export function ToolForm({
       })
     } finally {
       setBusy(false)
+      setUploadBytes(0)
     }
   }
 
@@ -159,6 +132,10 @@ export function ToolForm({
           )}
         </div>
       ))}
+
+      {busy && (
+        <AdobeJobProgress active={busy} totalUploadBytes={uploadBytes} />
+      )}
 
       {status && <StatusBanner message={status.message} type={status.type} />}
 

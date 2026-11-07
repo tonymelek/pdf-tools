@@ -68,7 +68,7 @@ export function FilePicker({
   )
 
   const applyIncoming = useCallback(
-    (incoming: FileList | File[]) => {
+    (incoming: FileList | File[]): File[] | null => {
       const result = mergeIncomingFiles(files, incoming, {
         accept,
         multiple,
@@ -78,7 +78,7 @@ export function FilePicker({
       })
       if (!result.ok) {
         setFlash({ type: 'error', text: result.error })
-        return
+        return null
       }
       setFiles(result.files)
       setFlash(
@@ -89,6 +89,7 @@ export function FilePicker({
             }
           : null,
       )
+      return result.files
     },
     [accept, files, maxBytes, maxFileSizeMb, maxFiles, multiple, setFiles],
   )
@@ -176,9 +177,20 @@ export function FilePicker({
         required={required && files.length === 0}
         className="sr-only"
         onChange={(e) => {
-          if (e.target.files?.length) applyIncoming(e.target.files)
-          else if (!isControlled) setFiles([])
-          e.target.value = ''
+          const input = e.target
+          let forSubmit = files
+          if (input.files?.length) {
+            const next = applyIncoming(input.files)
+            if (next) forSubmit = next
+          } else if (!isControlled) {
+            setFiles([])
+            forSubmit = []
+          }
+          // Reset so the same file can be picked again; restore FileList for FormData.
+          input.value = ''
+          if (name) {
+            syncInputFiles(input, forSubmit)
+          }
         }}
       />
 

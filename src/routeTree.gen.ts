@@ -14,7 +14,9 @@ import { Route as CombineRouteImport } from './routes/combine'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as SplitRouteImport } from './routes/split'
+import { Route as ApiSplitRouteImport } from './routes/api/split'
 import { Route as ToolsIdRouteImport } from './routes/tools/$id'
+import { Route as ApiSplitDownloadRouteImport } from './routes/api/split/download'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,10 +43,20 @@ const SplitRoute = SplitRouteImport.update({
   path: '/split',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSplitRoute = ApiSplitRouteImport.update({
+  id: '/api/split',
+  path: '/api/split',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsIdRoute = ToolsIdRouteImport.update({
   id: '/tools/$id',
   path: '/tools/$id',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSplitDownloadRoute = ApiSplitDownloadRouteImport.update({
+  id: '/download',
+  path: '/download',
+  getParentRoute: () => ApiSplitRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -53,7 +65,9 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/library': typeof LibraryRoute
   '/split': typeof SplitRoute
+  '/api/split': typeof ApiSplitRouteWithChildren
   '/tools/$id': typeof ToolsIdRoute
+  '/api/split/download': typeof ApiSplitDownloadRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,7 +75,9 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/library': typeof LibraryRoute
   '/split': typeof SplitRoute
+  '/api/split': typeof ApiSplitRouteWithChildren
   '/tools/$id': typeof ToolsIdRoute
+  '/api/split/download': typeof ApiSplitDownloadRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,13 +86,31 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/library': typeof LibraryRoute
   '/split': typeof SplitRoute
+  '/api/split': typeof ApiSplitRouteWithChildren
   '/tools/$id': typeof ToolsIdRoute
+  '/api/split/download': typeof ApiSplitDownloadRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/combine' | '/help' | '/library' | '/split' | '/tools/$id'
+  fullPaths:
+    | '/'
+    | '/combine'
+    | '/help'
+    | '/library'
+    | '/split'
+    | '/api/split'
+    | '/tools/$id'
+    | '/api/split/download'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/combine' | '/help' | '/library' | '/split' | '/tools/$id'
+  to:
+    | '/'
+    | '/combine'
+    | '/help'
+    | '/library'
+    | '/split'
+    | '/api/split'
+    | '/tools/$id'
+    | '/api/split/download'
   id:
     | '__root__'
     | '/'
@@ -84,7 +118,9 @@ export interface FileRouteTypes {
     | '/help'
     | '/library'
     | '/split'
+    | '/api/split'
     | '/tools/$id'
+    | '/api/split/download'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -93,6 +129,7 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   LibraryRoute: typeof LibraryRoute
   SplitRoute: typeof SplitRoute
+  ApiSplitRoute: typeof ApiSplitRouteWithChildren
   ToolsIdRoute: typeof ToolsIdRoute
 }
 
@@ -133,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SplitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/split': {
+      id: '/api/split'
+      path: '/api/split'
+      fullPath: '/api/split'
+      preLoaderRoute: typeof ApiSplitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/$id': {
       id: '/tools/$id'
       path: '/tools/$id'
@@ -140,8 +184,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/split/download': {
+      id: '/api/split/download'
+      path: '/download'
+      fullPath: '/api/split/download'
+      preLoaderRoute: typeof ApiSplitDownloadRouteImport
+      parentRoute: typeof ApiSplitRoute
+    }
   }
 }
+
+interface ApiSplitRouteChildren {
+  ApiSplitDownloadRoute: typeof ApiSplitDownloadRoute
+}
+
+const ApiSplitRouteChildren: ApiSplitRouteChildren = {
+  ApiSplitDownloadRoute: ApiSplitDownloadRoute,
+}
+
+const ApiSplitRouteWithChildren = ApiSplitRoute._addFileChildren(
+  ApiSplitRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -149,6 +212,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   LibraryRoute: LibraryRoute,
   SplitRoute: SplitRoute,
+  ApiSplitRoute: ApiSplitRouteWithChildren,
   ToolsIdRoute: ToolsIdRoute,
 }
 export const routeTree = rootRouteImport
